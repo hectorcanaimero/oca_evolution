@@ -10,7 +10,9 @@
       "Bash(python3 -m py_compile __init__.py __manifest__.py models/*.py tests/*.py)",
       "Bash(python3 -c \"import odoo; print\\(odoo.__file__\\)\")",
       "Bash(pip3 show *)",
-      "Bash(git commit *)"
+      "Bash(git commit *)",
+      "Bash(python3 -c ' *)",
+      "Bash(python3 -m py_compile /Users/editor2/dev/evo_whatsapp/odoo-test/addons/evolution_whatsapp/controllers/webhook.py /Users/editor2/dev/evo_whatsapp/odoo-test/addons/evolution_whatsapp/models/discuss_channel.py /Users/editor2/dev/evo_whatsapp/odoo-test/addons/evolution_whatsapp/models/__init__.py /Users/editor2/dev/evo_whatsapp/odoo-test/addons/evolution_whatsapp/__manifest__.py)"
     ]
   }
 }

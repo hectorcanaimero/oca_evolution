@@ -5,7 +5,7 @@
         <field name="model">evolution.instance</field>
         <field name="inherit_id" ref="evolution_whatsapp.view_evolution_instance_form"/>
         <field name="arch" type="xml">
-            <xpath expr="//page[@string='Webhook']" position="after">
+            <xpath expr="//page[@name='webhook']" position="after">
                 <page string="Integraciones">
                     <notebook>
                         <page string="CRM">

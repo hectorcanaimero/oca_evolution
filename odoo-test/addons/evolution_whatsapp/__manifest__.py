@@ -1,6 +1,6 @@
 {
     "name": "Evolution",
-    "version": "18.0.2.0.0",
+    "version": "18.0.3.0.0",
     "category": "Marketing",
     "summary": "Integración WhatsApp con Evolution Go API + plantillas + chatter",
     "description": """
@@ -12,7 +12,9 @@ Integración completa con Evolution Go para WhatsApp:
 * Composer integrado: aparece "Enviar por WhatsApp" en el menú Acción
   de partners, leads, presupuestos, facturas, compras, tareas y tickets
 * Registro en el chatter del documento origen
-* Webhook controller para eventos entrantes
+* Webhook controller para eventos entrantes (contrato real de Evolution Go)
+* Bandeja de WhatsApp nativa en Discuss: cada número que escribe abre un canal,
+  los agentes responden sin salir de Odoo
 * Permisos por grupo (Usuario / Administrador)
 """,
     "author": "Héctor Velásquez",
