@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_evolution_instance_form_crm" model="ir.ui.view">
+        <field name="name">evolution.instance.form.crm</field>
+        <field name="model">evolution.instance</field>
+        <field name="inherit_id" ref="evolution_whatsapp.view_evolution_instance_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@string='Webhook']" position="after">
+                <page string="Integraciones">
+                    <notebook>
+                        <page string="CRM">
+                            <group>
+                                <field name="crm_integration_enabled"/>
+                            </group>
+                            <group invisible="not crm_integration_enabled">
+                                <field name="crm_team_id"/>
+                                <field name="crm_user_id"/>
+                                <field name="crm_reopen_days"/>
+                            </group>
+                            <p class="text-muted" invisible="not crm_integration_enabled">
+                                Cuando llega un mensaje de un número sin lead abierto
+                                con actividad reciente, se crea un lead de CRM
+                                automáticamente y el mensaje queda en su chatter.
+                            </p>
+                        </page>
+                    </notebook>
+                </page>
+            </xpath>
+        </field>
+    </record>
+</odoo>

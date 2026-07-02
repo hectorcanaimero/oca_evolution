@@ -1,0 +1,8 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_evolution_instance_user,evolution.instance.user,model_evolution_instance,group_evolution_user,1,0,0,0
+access_evolution_instance_manager,evolution.instance.manager,model_evolution_instance,group_evolution_manager,1,1,1,1
+access_evolution_message_user,evolution.message.user,model_evolution_message,group_evolution_user,1,1,1,0
+access_evolution_message_manager,evolution.message.manager,model_evolution_message,group_evolution_manager,1,1,1,1
+access_whatsapp_template_user,whatsapp.template.user,model_whatsapp_template,group_evolution_user,1,0,0,0
+access_whatsapp_template_manager,whatsapp.template.manager,model_whatsapp_template,group_evolution_manager,1,1,1,1
+access_whatsapp_composer_user,whatsapp.composer.user,model_whatsapp_composer,group_evolution_user,1,1,1,1

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_evolution_message_form_crm" model="ir.ui.view">
+        <field name="name">evolution.message.form.crm</field>
+        <field name="model">evolution.message</field>
+        <field name="inherit_id" ref="evolution_whatsapp.view_evolution_message_form"/>
+        <field name="arch" type="xml">
+            <field name="external_id" position="after">
+                <field name="lead_id" invisible="not lead_id"/>
+            </field>
+        </field>
+    </record>
+</odoo>

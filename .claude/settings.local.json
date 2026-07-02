@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(docker compose *)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" http://localhost:8069/web/login)",
+      "Bash(xmllint --noout /Users/editor2/dev/evo_whatsapp/odoo-test/addons/evolution_whatsapp/views/evolution_menus.xml)",
+      "Bash(rg -n \"\\\\\"crm\\\\\"|'crm'\" /Users/editor2/dev/evo_whatsapp/odoo-test/addons/*/  -l)",
+      "Bash(bat -p /Users/editor2/dev/evo_whatsapp/odoo-test/addons/evolution_whatsapp/security/*.xml /Users/editor2/dev/evo_whatsapp/odoo-test/addons/evolution_whatsapp/security/*.csv)",
+      "Bash(bat -p /Users/editor2/dev/evo_whatsapp/odoo-test/addons/evolution_whatsapp/__manifest__.py)",
+      "Bash(python3 -m py_compile __init__.py __manifest__.py models/*.py tests/*.py)",
+      "Bash(python3 -c \"import odoo; print\\(odoo.__file__\\)\")",
+      "Bash(pip3 show *)",
+      "Bash(git commit *)"
+    ]
+  }
+}

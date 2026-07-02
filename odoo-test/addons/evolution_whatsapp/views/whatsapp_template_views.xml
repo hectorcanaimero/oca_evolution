@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_whatsapp_template_list" model="ir.ui.view">
+        <field name="name">whatsapp.template.list</field>
+        <field name="model">whatsapp.template</field>
+        <field name="arch" type="xml">
+            <list string="Plantillas WhatsApp" sample="1">
+                <field name="name"/>
+                <field name="model_id"/>
+                <field name="message_type"/>
+                <field name="instance_id"/>
+                <field name="active" widget="boolean_toggle" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_whatsapp_template_form" model="ir.ui.view">
+        <field name="name">whatsapp.template.form</field>
+        <field name="model">whatsapp.template</field>
+        <field name="arch" type="xml">
+            <form string="Plantilla WhatsApp">
+                <header>
+                    <button name="action_open_composer" type="object"
+                            string="Probar envío" class="oe_highlight"/>
+                </header>
+                <sheet>
+                    <widget name="web_ribbon" title="Archivada" bg_color="bg-danger"
+                            invisible="active"/>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" placeholder="Confirmación de pedido"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="model_id" options="{'no_create': True}"/>
+                            <field name="model" invisible="1"/>
+                            <field name="instance_id" options="{'no_create': True}"/>
+                            <field name="message_type"/>
+                            <field name="active"/>
+                        </group>
+                        <group>
+                            <field name="phone_field"
+                                   placeholder="partner_id.mobile"
+                                   help="Dejá vacío para auto-detectar (mobile, phone, partner_id.mobile, partner_id.phone)"/>
+                            <field name="use_default_recipient"/>
+                            <field name="report_template_id"
+                                   options="{'no_create': True}"
+                                   invisible="message_type == 'text'"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Cuerpo">
+                            <field name="body" placeholder="Hola {{ object.partner_id.name }},&#10;tu pedido {{ object.name }} fue confirmado por un total de {{ object.amount_total }}."/>
+                            <div class="text-muted mt-2">
+                                <p>
+                                    <strong>¿Cómo armar el mensaje?</strong> Escribí texto normal y donde
+                                    necesites un dato del registro (el que elegiste en "Modelo aplicable"),
+                                    usá doble llave <code>{{ }}</code>. Adentro siempre arrancás con
+                                    <code>object</code> — es el registro puntual que dispara el envío
+                                    (ese pedido, ese lead, esa factura).
+                                </p>
+                                <table class="table table-sm">
+                                    <thead>
+                                        <tr><th>Querés poner</th><th>Escribís</th></tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>Un campo del registro</td>
+                                            <td><code>{{ object.name }}</code></td>
+                                        </tr>
+                                        <tr>
+                                            <td>Un campo de un registro relacionado
+                                                (cliente, producto, etc.)</td>
+                                            <td><code>{{ object.partner_id.name }}</code></td>
+                                        </tr>
+                                        <tr>
+                                            <td>Podés encadenar relaciones (2 o más niveles)</td>
+                                            <td><code>{{ object.partner_id.country_id.name }}</code></td>
+                                        </tr>
+                                        <tr>
+                                            <td>Números con su moneda</td>
+                                            <td><code>{{ object.amount_total }} {{ object.currency_id.symbol }}</code></td>
+                                        </tr>
+                                        <tr>
+                                            <td>Texto condicional (si/no hay dato)</td>
+                                            <td><code>{{ 'Sr. ' if object.partner_id.title else '' }}</code></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <p>
+                                    Tip: para saber qué campos tiene disponibles el modelo elegido,
+                                    activá el modo desarrollador y mirá el nombre técnico del campo
+                                    en el formulario de ese registro (ícono de bug → "Ver campos").
+                                    Después de escribir el cuerpo, usá el botón <strong>"Probar envío"</strong>
+                                    arriba para ver el mensaje ya renderizado con datos reales antes de
+                                    mandarlo de verdad.
+                                </p>
+                            </div>
+                        </page>
+                        <page string="Adjuntos" invisible="message_type == 'text'">
+                            <field name="attachment_ids" widget="many2many_binary"/>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_whatsapp_template_search" model="ir.ui.view">
+        <field name="name">whatsapp.template.search</field>
+        <field name="model">whatsapp.template</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="model_id"/>
+                <field name="instance_id"/>
+                <filter string="Archivadas" name="inactive" domain="[('active','=',False)]"/>
+                <group expand="0" string="Agrupar por">
+                    <filter string="Modelo" name="g_model" context="{'group_by':'model_id'}"/>
+                    <filter string="Instancia" name="g_inst" context="{'group_by':'instance_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_whatsapp_template" model="ir.actions.act_window">
+        <field name="name">Plantillas WhatsApp</field>
+        <field name="res_model">whatsapp.template</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_whatsapp_template_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Creá una plantilla</p>
+            <p>Las plantillas usan QWeb inline para renderizar el mensaje con
+               los datos del registro (sale.order, crm.lead, etc).</p>
+        </field>
+    </record>
+</odoo>

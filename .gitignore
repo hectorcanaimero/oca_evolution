@@ -1,0 +1,42 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+
+# Odoo runtime
+*.sqlite
+*.log
+filestore/
+data_dir/
+sessions/
+addons_path/
+
+# Secrets & config local
+.env
+.env.*
+!.env.example
+odoo.conf
+*.key
+*.pem
+
+# macOS
+.DS_Store
+._*
+.Spotlight-V100
+.Trashes
+
+# Editors
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Deploy artifacts
+/tmp/
+*.tar.gz
+*.zip

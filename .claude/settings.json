@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(rg -l \"\" /Users/editor2/dev/evo_whatsapp/evolution_whatsapp --files)",
+      "Bash(python3 -m py_compile /Users/editor2/dev/evo_whatsapp/odoo-test/addons/evolution_whatsapp/models/evolution_instance.py)"
+    ]
+  }
+}

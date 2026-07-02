@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_evolution_message_list" model="ir.ui.view">
+        <field name="name">evolution.message.list</field>
+        <field name="model">evolution.message</field>
+        <field name="arch" type="xml">
+            <list string="Mensajes" sample="1"
+                  decoration-success="state in ('sent','delivered','read')"
+                  decoration-warning="state == 'sending'"
+                  decoration-danger="state == 'failed'"
+                  decoration-muted="state == 'draft'">
+                <field name="create_date" string="Fecha"/>
+                <field name="instance_id"/>
+                <field name="direction"/>
+                <field name="recipient"/>
+                <field name="message_type"/>
+                <field name="body" optional="show"/>
+                <field name="state"/>
+                <field name="external_id" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_evolution_message_kanban" model="ir.ui.view">
+        <field name="name">evolution.message.kanban</field>
+        <field name="model">evolution.message</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="state" class="o_kanban_small_column" sample="1">
+                <field name="id"/>
+                <field name="instance_id"/>
+                <field name="recipient"/>
+                <field name="message_type"/>
+                <field name="body"/>
+                <field name="state"/>
+                <field name="direction"/>
+                <field name="sent_at"/>
+                <field name="create_date"/>
+                <templates>
+                    <t t-name="card">
+                        <div class="oe_kanban_global_click">
+                            <div class="o_kanban_record_top">
+                                <strong>
+                                    <i t-attf-class="fa #{record.direction.raw_value === 'incoming' ? 'fa-arrow-down' : 'fa-arrow-up'} me-1"
+                                       title="Dirección" role="img" aria-label="Dirección"/>
+                                    <field name="recipient"/>
+                                </strong>
+                            </div>
+                            <div class="text-muted">
+                                <field name="instance_id"/>
+                            </div>
+                            <div t-if="record.body.raw_value" class="mt-1">
+                                <field name="body"/>
+                            </div>
+                            <div class="mt-1">
+                                <field name="message_type" widget="badge"/>
+                            </div>
+                            <div t-if="record.sent_at.raw_value" class="text-muted mt-1">
+                                <small>
+                                    <i class="fa fa-clock-o me-1" title="Enviado" role="img" aria-label="Enviado"/>
+                                    <field name="sent_at"/>
+                                </small>
+                            </div>
+                            <div t-if="!record.sent_at.raw_value" class="text-muted mt-1">
+                                <small>
+                                    <i class="fa fa-pencil me-1" title="Creado" role="img" aria-label="Creado"/>
+                                    <field name="create_date"/>
+                                </small>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="view_evolution_message_calendar" model="ir.ui.view">
+        <field name="name">evolution.message.calendar</field>
+        <field name="model">evolution.message</field>
+        <field name="arch" type="xml">
+            <calendar string="Mensajes WhatsApp"
+                      date_start="sent_at"
+                      color="instance_id"
+                      mode="month">
+                <field name="recipient"/>
+                <field name="instance_id" filters="1"/>
+                <field name="state"/>
+                <field name="message_type"/>
+                <field name="direction" filters="1"/>
+            </calendar>
+        </field>
+    </record>
+
+    <record id="view_evolution_message_form" model="ir.ui.view">
+        <field name="name">evolution.message.form</field>
+        <field name="model">evolution.message</field>
+        <field name="arch" type="xml">
+            <form string="Mensaje WhatsApp">
+                <header>
+                    <button name="action_resend" type="object"
+                            string="Reintentar"
+                            invisible="state != 'failed' or direction != 'outgoing'"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,sending,sent,delivered,read"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="instance_id"/>
+                            <field name="direction"/>
+                            <field name="recipient"/>
+                            <field name="message_type"/>
+                        </group>
+                        <group>
+                            <field name="external_id"/>
+                            <field name="sent_at"/>
+                            <field name="filename" invisible="message_type == 'text'"/>
+                            <field name="mimetype" invisible="message_type == 'text'"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Contenido">
+                            <field name="body"/>
+                            <field name="media_url" invisible="message_type == 'text'"/>
+                            <field name="attachment_id" invisible="message_type == 'text'"/>
+                        </page>
+                        <page string="Error" invisible="not error_message">
+                            <field name="error_message" readonly="1"/>
+                        </page>
+                        <page string="Respuesta raw" groups="evolution_whatsapp.group_evolution_manager">
+                            <field name="raw_response" readonly="1"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_evolution_message_search" model="ir.ui.view">
+        <field name="name">evolution.message.search</field>
+        <field name="model">evolution.message</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="recipient"/>
+                <field name="body"/>
+                <field name="external_id"/>
+                <field name="instance_id"/>
+                <filter string="Salientes" name="outgoing" domain="[('direction','=','outgoing')]"/>
+                <filter string="Entrantes" name="incoming" domain="[('direction','=','incoming')]"/>
+                <separator/>
+                <filter string="Enviados" name="sent" domain="[('state','in',['sent','delivered','read'])]"/>
+                <filter string="Fallidos" name="failed" domain="[('state','=','failed')]"/>
+                <group expand="0" string="Agrupar por">
+                    <filter string="Instancia" name="g_inst" context="{'group_by':'instance_id'}"/>
+                    <filter string="Estado" name="g_state" context="{'group_by':'state'}"/>
+                    <filter string="Tipo" name="g_type" context="{'group_by':'message_type'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_evolution_message" model="ir.actions.act_window">
+        <field name="name">Mensajes WhatsApp</field>
+        <field name="res_model">evolution.message</field>
+        <field name="view_mode">list,kanban,calendar,form</field>
+        <field name="search_view_id" ref="view_evolution_message_search"/>
+    </record>
+
+    <record id="action_evolution_message_outgoing" model="ir.actions.act_window">
+        <field name="name">WhatsApp</field>
+        <field name="res_model">evolution.message</field>
+        <field name="view_mode">list,kanban,calendar,form</field>
+        <field name="search_view_id" ref="view_evolution_message_search"/>
+        <field name="context">{'search_default_outgoing': 1}</field>
+    </record>
+</odoo>

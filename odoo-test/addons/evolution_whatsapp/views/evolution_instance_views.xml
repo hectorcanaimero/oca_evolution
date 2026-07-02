@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_evolution_instance_list" model="ir.ui.view">
+        <field name="name">evolution.instance.list</field>
+        <field name="model">evolution.instance</field>
+        <field name="arch" type="xml">
+            <list string="Instancias WhatsApp" sample="1"
+                  decoration-success="state == 'connected'"
+                  decoration-warning="state == 'qrcode'"
+                  decoration-danger="state == 'error'"
+                  decoration-muted="state in ('draft','disconnected')">
+                <field name="name"/>
+                <field name="phone_number"/>
+                <field name="state"/>
+                <field name="message_count"/>
+                <field name="last_event_at"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_evolution_instance_kanban" model="ir.ui.view">
+        <field name="name">evolution.instance.kanban</field>
+        <field name="model">evolution.instance</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="state" class="o_kanban_small_column">
+                <field name="id"/>
+                <field name="name"/>
+                <field name="phone_number"/>
+                <field name="state"/>
+                <field name="message_count"/>
+                <templates>
+                    <t t-name="card">
+                        <div class="oe_kanban_global_click">
+                            <div class="o_kanban_record_top">
+                                <strong><field name="name"/></strong>
+                            </div>
+                            <div t-if="record.phone_number.raw_value" class="text-muted">
+                                <i class="fa fa-phone" title="Teléfono" role="img" aria-label="Teléfono"/> <field name="phone_number"/>
+                            </div>
+                            <div>
+                                <field name="state" widget="label_selection"
+                                       options="{'classes': {'connected':'success','qrcode':'warning','error':'danger','disconnected':'muted','draft':'muted'}}"/>
+                            </div>
+                            <div class="text-muted">
+                                <small><field name="message_count"/> mensajes</small>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="view_evolution_instance_form" model="ir.ui.view">
+        <field name="name">evolution.instance.form</field>
+        <field name="model">evolution.instance</field>
+        <field name="arch" type="xml">
+            <form string="Instancia WhatsApp">
+                <header>
+                    <button name="action_create_in_evolution" type="object"
+                            string="Crear en Evolution" class="oe_highlight"
+                            invisible="state != 'draft'"
+                            groups="evolution_whatsapp.group_evolution_manager"/>
+                    <button name="action_refresh_qr" type="object"
+                            string="Obtener / Refrescar QR" class="oe_highlight"
+                            invisible="state not in ('qrcode','disconnected','error')"/>
+                    <button name="action_refresh_state" type="object"
+                            string="Refrescar estado"
+                            invisible="state == 'draft'"/>
+                    <button name="action_open_send_wizard" type="object"
+                            string="Enviar mensaje"
+                            invisible="state != 'connected'"/>
+                    <button name="action_logout" type="object"
+                            string="Cerrar sesión" confirm="¿Cerrar la sesión de WhatsApp?"
+                            invisible="state != 'connected'"
+                            groups="evolution_whatsapp.group_evolution_manager"/>
+                    <button name="action_delete_in_evolution" type="object"
+                            string="Eliminar en Evolution" confirm="¿Eliminar la instancia del servidor? Esta acción no se puede deshacer."
+                            invisible="state == 'draft'"
+                            groups="evolution_whatsapp.group_evolution_manager"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,qrcode,connected"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_messages" type="object"
+                                class="oe_stat_button" icon="fa-comments">
+                            <field name="message_count" widget="statinfo" string="Mensajes"/>
+                        </button>
+                    </div>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" placeholder="ventas_bot"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="phone_number" readonly="1"/>
+                            <field name="qr_fetched_at" readonly="1"/>
+                            <field name="last_event_at" readonly="1"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Conexión">
+                            <group>
+                                <field name="evolution_api_url"/>
+                                <field name="evolution_global_apikey" password="True" groups="evolution_whatsapp.group_evolution_manager"/>
+                                <field name="token" readonly="1" password="True" groups="evolution_whatsapp.group_evolution_manager"/>
+                                <field name="remote_id" readonly="1" groups="evolution_whatsapp.group_evolution_manager"/>
+                            </group>
+                            <group invisible="state not in ('qrcode','disconnected','error')">
+                                <field name="qr_code" widget="image" nolabel="1"
+                                       options="{'size': [320, 320]}"/>
+                                <field name="qr_code_text" readonly="1"
+                                       string="Pairing code"/>
+                            </group>
+                            <p class="text-muted" invisible="state not in ('qrcode','disconnected','error')">
+                                Escaneá el QR desde WhatsApp → Dispositivos vinculados → Vincular un dispositivo.
+                                El QR caduca rápido — si no funciona, presioná "Refrescar QR".
+                            </p>
+                        </page>
+                        <page string="Proxy (opcional)" groups="evolution_whatsapp.group_evolution_manager">
+                            <group>
+                                <field name="proxy_address"/>
+                                <field name="proxy_port"/>
+                                <field name="proxy_username"/>
+                                <field name="proxy_password" password="True"/>
+                            </group>
+                        </page>
+                        <page string="Webhook" name="webhook">
+                            <group>
+                                <field name="webhook_url" readonly="1" widget="CopyClipboardChar"/>
+                                <field name="evolution_webhook_base_url"/>
+                                <field name="evolution_default_country_code"/>
+                            </group>
+                        </page>
+                        <page string="Enviar prueba" invisible="state != 'connected'">
+                            <group>
+                                <field name="test_recipient"
+                                       placeholder="5491155556666"/>
+                            </group>
+                            <button name="action_send_test_message" type="object"
+                                    string="Enviar mensaje de prueba"
+                                    class="btn-primary"/>
+                        </page>
+                        <page string="Errores" invisible="not last_error">
+                            <field name="last_error" readonly="1"/>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_evolution_instance_search" model="ir.ui.view">
+        <field name="name">evolution.instance.search</field>
+        <field name="model">evolution.instance</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="phone_number"/>
+                <filter string="Conectadas" name="connected" domain="[('state','=','connected')]"/>
+                <filter string="Esperando QR" name="qr" domain="[('state','=','qrcode')]"/>
+                <filter string="Desconectadas" name="disc" domain="[('state','=','disconnected')]"/>
+                <filter string="Con errores" name="err" domain="[('state','=','error')]"/>
+                <group expand="0" string="Agrupar por">
+                    <filter string="Estado" name="group_state" context="{'group_by':'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_evolution_instance" model="ir.actions.act_window">
+        <field name="name">Instancias WhatsApp</field>
+        <field name="res_model">evolution.instance</field>
+        <field name="view_mode">kanban,list,form</field>
+        <field name="search_view_id" ref="view_evolution_instance_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Creá una instancia</p>
+            <p>Cada instancia es un número de WhatsApp conectado vía Evolution Go.</p>
+        </field>
+    </record>
+
+    <record id="action_evolution_instance_singleton" model="ir.actions.server">
+        <field name="name">Instancia</field>
+        <field name="model_id" ref="model_evolution_instance"/>
+        <field name="state">code</field>
+        <field name="code">action = model.action_open_singleton()</field>
+    </record>
+</odoo>

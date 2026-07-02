@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_whatsapp_composer_form" model="ir.ui.view">
+        <field name="name">whatsapp.composer.form</field>
+        <field name="model">whatsapp.composer</field>
+        <field name="arch" type="xml">
+            <form string="Enviar por WhatsApp">
+                <sheet>
+                    <div class="alert alert-info" role="alert"
+                         invisible="composition_mode != 'mass' or not number_of_records">
+                        <i class="fa fa-users"/> Envío masivo a
+                        <field name="number_of_records" class="oe_inline"/>
+                        registros seleccionados.
+                    </div>
+                    <group>
+                        <group>
+                            <field name="instance_id" options="{'no_create': True}"/>
+                            <field name="template_id" options="{'no_create': True}"
+                                   invisible="not res_model"/>
+                            <field name="message_type" widget="radio"
+                                   options="{'horizontal': true}"/>
+                        </group>
+                        <group>
+                            <field name="res_model" invisible="1"/>
+                            <field name="res_ids" invisible="1"/>
+                            <field name="composition_mode" invisible="1"/>
+                            <field name="use_template_recipient"
+                                   invisible="not res_model"/>
+                            <field name="manual_recipients"
+                                   placeholder="5491155556666, 5491166667777"
+                                   invisible="use_template_recipient and res_model"
+                                   required="not use_template_recipient or not res_model"/>
+                            <field name="delay_ms"/>
+                            <field name="log_in_chatter" invisible="not res_model"/>
+                        </group>
+                    </group>
+                    <group invisible="message_type == 'text'" string="Archivo">
+                        <field name="source" widget="radio" options="{'horizontal': true}"/>
+                        <field name="attachment" filename="attachment_filename"
+                               invisible="source != 'attachment'"
+                               required="message_type != 'text' and source == 'attachment'"/>
+                        <field name="attachment_filename" invisible="source != 'attachment'"/>
+                        <field name="media_url"
+                               invisible="source != 'url'"
+                               required="message_type != 'text' and source == 'url'"
+                               placeholder="https://example.com/file.pdf"/>
+                        <field name="attachment_ids" widget="many2many_binary"
+                               invisible="source != 'template'"/>
+                    </group>
+                    <group string="Mensaje">
+                        <field name="body" nolabel="1"
+                               placeholder="Escribí el mensaje o elegí una plantilla..."/>
+                    </group>
+                    <group invisible="not result_log" string="Resultado">
+                        <field name="result_count_sent" readonly="1"/>
+                        <field name="result_count_failed" readonly="1"/>
+                        <field name="result_log" readonly="1" nolabel="1"/>
+                    </group>
+                </sheet>
+                <footer>
+                    <button name="action_send" type="object" string="Enviar"
+                            class="btn-primary" invisible="result_log"/>
+                    <button string="Cerrar" class="btn-secondary" special="cancel"
+                            invisible="not result_log"/>
+                    <button string="Cancelar" class="btn-secondary" special="cancel"
+                            invisible="result_log"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <record id="module_category_evolution" model="ir.module.category">
+            <field name="name">Evolution WhatsApp</field>
+            <field name="description">Permisos para el módulo Evolution WhatsApp</field>
+            <field name="sequence">20</field>
+        </record>
+
+        <record id="group_evolution_user" model="res.groups">
+            <field name="name">Usuario</field>
+            <field name="category_id" ref="module_category_evolution"/>
+            <field name="comment">Puede enviar mensajes y ver historial.</field>
+        </record>
+
+        <record id="group_evolution_manager" model="res.groups">
+            <field name="name">Administrador</field>
+            <field name="category_id" ref="module_category_evolution"/>
+            <field name="implied_ids" eval="[(4, ref('group_evolution_user'))]"/>
+            <field name="users" eval="[(4, ref('base.user_root')), (4, ref('base.user_admin'))]"/>
+            <field name="comment">Gestiona instancias, conexiones y configuración global.</field>
+        </record>
+
+        <!--
+            Reglas multi-company: cada instancia, mensaje y plantilla pertenece
+            a UNA empresa (tenant). Un usuario solo ve las de sus companies
+            permitidas (allowed_company_ids).
+        -->
+        <record id="evolution_instance_company_rule" model="ir.rule">
+            <field name="name">evolution.instance: multi-company</field>
+            <field name="model_id" ref="model_evolution_instance"/>
+            <field name="domain_force">
+                [('company_id', 'in', company_ids)]
+            </field>
+            <field name="global" eval="True"/>
+        </record>
+
+        <record id="evolution_message_company_rule" model="ir.rule">
+            <field name="name">evolution.message: multi-company</field>
+            <field name="model_id" ref="model_evolution_message"/>
+            <field name="domain_force">
+                [('company_id', 'in', company_ids)]
+            </field>
+            <field name="global" eval="True"/>
+        </record>
+
+        <record id="whatsapp_template_company_rule" model="ir.rule">
+            <field name="name">whatsapp.template: multi-company</field>
+            <field name="model_id" ref="model_whatsapp_template"/>
+            <field name="domain_force">
+                [('company_id', 'in', company_ids)]
+            </field>
+            <field name="global" eval="True"/>
+        </record>
+    </data>
+</odoo>

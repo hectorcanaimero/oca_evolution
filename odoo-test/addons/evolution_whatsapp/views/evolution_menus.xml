@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="menu_evolution_root"
+              name="Evolution"
+              action="action_evolution_message_outgoing"
+              web_icon="evolution_whatsapp,static/description/icon.png"
+              sequence="90"
+              groups="evolution_whatsapp.group_evolution_user"/>
+
+    <menuitem id="menu_evolution_messages"
+              name="Mensajes"
+              parent="menu_evolution_root"
+              action="action_evolution_message"
+              sequence="20"
+              groups="evolution_whatsapp.group_evolution_user"/>
+
+    <menuitem id="menu_evolution_templates"
+              name="Plantillas"
+              parent="menu_evolution_root"
+              action="action_whatsapp_template"
+              sequence="30"
+              groups="evolution_whatsapp.group_evolution_user"/>
+
+    <menuitem id="menu_evolution_config"
+              name="Configuración"
+              parent="menu_evolution_root"
+              action="action_evolution_instance_singleton"
+              sequence="90"
+              groups="evolution_whatsapp.group_evolution_manager"/>
+</odoo>
