@@ -13,8 +13,7 @@ Integración completa con Evolution Go para WhatsApp:
   de partners, leads, presupuestos, facturas, compras, tareas y tickets
 * Registro en el chatter del documento origen
 * Webhook controller para eventos entrantes (contrato real de Evolution Go)
-* Bandeja de WhatsApp nativa en Discuss: cada número que escribe abre un canal,
-  los agentes responden sin salir de Odoo
+* Hook de extensión (`_notify_inbound_message`) para módulos puente
 * Permisos por grupo (Usuario / Administrador)
 """,
     "author": "Héctor Velásquez",
@@ -31,6 +30,7 @@ Integración completa con Evolution Go para WhatsApp:
         "views/whatsapp_template_views.xml",
         "views/whatsapp_composer_views.xml",
         "views/evolution_menus.xml",
+        "views/evolution_integrations_views.xml",
     ],
     "pre_init_hook": "_pre_init_hook",
     "post_init_hook": "_post_init_hook",

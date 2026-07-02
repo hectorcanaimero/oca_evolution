@@ -476,6 +476,14 @@ class EvolutionInstance(models.Model):
             instance = self.create({"company_id": company.id, "name": slug[:50] or "whatsapp"})
         return instance._open_form()
 
+    # ---------------- Hooks de extensión ----------------
+
+    def _notify_inbound_message(self, phone, body, push_name):
+        """No-op por defecto. Módulos puente (evolution_discuss, evolution_crm,
+        etc.) lo sobreescriben para reaccionar a un mensaje de texto entrante
+        1:1 sin acoplar este módulo a lo que hagan con él."""
+        return
+
     # ---------------- Cron ----------------
 
     @api.model

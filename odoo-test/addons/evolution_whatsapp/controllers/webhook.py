@@ -117,20 +117,12 @@ class EvolutionWebhookController(http.Controller):
             "sent_at": fields.Datetime.now() if from_me else False,
         })
 
-        # v1 del inbox nativo en Discuss: solo texto entrante 1:1.
-        # Grupos y adjuntos quedan afuera por ahora (ver evolution_go_discuss_inbox memory).
+        # Solo texto entrante 1:1 dispara el hook; grupos/adjuntos quedan afuera
+        # por ahora. Qué hace cada instalación con esto (Discuss, CRM, nada) es
+        # responsabilidad de los módulos puente, no de este controller.
         if is_group or from_me or not phone or not body:
             return
-
-        channel = request.env["discuss.channel"].sudo()._evolution_get_or_create(
-            instance, phone, info.get("PushName")
-        )
-        channel.with_context(evolution_skip_send=True).message_post(
-            body=body,
-            author_id=channel.evolution_partner_id.id,
-            message_type="comment",
-            subtype_xmlid="mail.mt_comment",
-        )
+        instance._notify_inbound_message(phone, body, info.get("PushName"))
 
     def _handle_receipt(self, instance, payload):
         data = payload.get("data") or {}
