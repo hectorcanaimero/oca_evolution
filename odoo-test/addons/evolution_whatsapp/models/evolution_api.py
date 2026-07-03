@@ -45,14 +45,14 @@ class EvolutionAPI:
             headers.update(extra)
         return headers
 
-    def _request(self, method, path, json=None, params=None):
+    def _request(self, method, path, json=None, params=None, extra_headers=None):
         url = urljoin(self.base_url, path.lstrip("/"))
         _logger.warning("Evolution %s %s payload=%s", method, url, json)
         try:
             response = requests.request(
                 method,
                 url,
-                headers=self._headers(),
+                headers=self._headers(extra=extra_headers),
                 json=json,
                 params=params,
                 timeout=self.timeout,
@@ -95,6 +95,21 @@ class EvolutionAPI:
 
     def fetch_all_instances(self):
         return self._request("GET", "/instance/all")
+
+    def connect_instance(self, instance_id, webhook_url, subscribe=None, immediate=True):
+        """POST /instance/connect — (re)registra el webhook de una instancia
+        ya creada. Requiere el UUID remoto vía header 'instanceId', además
+        del apikey global habitual."""
+        payload = {
+            "webhookUrl": webhook_url,
+            "subscribe": subscribe or ["ALL"],
+            "immediate": immediate,
+        }
+        return self._request(
+            "POST", "/instance/connect",
+            json=payload,
+            extra_headers={"instanceId": instance_id},
+        )
 
     def get_qr(self):
         """La instancia se resuelve por el header apikey (token de instancia), sin path param."""

@@ -186,6 +186,28 @@ class EvolutionInstance(models.Model):
             "password": self.proxy_password or "",
         }
 
+    def _sync_remote_id(self):
+        """Si remote_id está vacío, lo recupera listando instancias en
+        Evolution Go y matcheando por name o token. No falla si no hay
+        match — devuelve False y el llamador decide si es fatal."""
+        self.ensure_one()
+        if self.remote_id:
+            return True
+        try:
+            response = self._global_api().fetch_all_instances()
+        except EvolutionAPIError as exc:
+            _logger.warning(
+                "No se pudo listar instancias para sync remote_id de %s: %s",
+                self.name, exc,
+            )
+            return False
+        for item in (response or {}).get("data") or []:
+            if item.get("name") == self.name or (self.token and item.get("token") == self.token):
+                if item.get("id"):
+                    self.write({"remote_id": item["id"]})
+                    return True
+        return False
+
     # ---------------- Actions ----------------
 
     def action_create_in_evolution(self):
@@ -245,6 +267,17 @@ class EvolutionInstance(models.Model):
                     if code_extra:
                         rec.qr_code_text = code_extra
             rec.message_post(body=_("Instancia creada en Evolution Go."))
+            try:
+                rec.action_register_webhook()
+            except (EvolutionAPIError, UserError) as exc:
+                _logger.warning(
+                    "No se pudo registrar el webhook automáticamente para %s: %s",
+                    rec.name, exc,
+                )
+                rec.message_post(body=_(
+                    "⚠️ No se pudo registrar el webhook automáticamente (%s). "
+                    "Hacelo manual desde la pestaña Webhook."
+                ) % exc)
         return True
 
     def action_refresh_qr(self):
@@ -335,6 +368,35 @@ class EvolutionInstance(models.Model):
                 "phone_number": False,
             })
             rec.message_post(body=_("Instancia eliminada del servidor."))
+        return True
+
+    def action_register_webhook(self):
+        """A diferencia del fetch de QR (best-effort, solo logea), esta
+        acción SÍ debe fallar visiblemente si Evolution Go la rechaza —
+        registrar el webhook es el propósito explícito del botón."""
+        for rec in self:
+            if not rec._sync_remote_id():
+                raise UserError(_(
+                    "No se pudo determinar el ID remoto de '%s' en Evolution Go. "
+                    "Verificá que la instancia exista ahí y que nombre/token coincidan."
+                ) % rec.name)
+            if not rec.webhook_url:
+                raise UserError(_(
+                    "No se pudo calcular la URL del webhook. Configurá 'URL pública "
+                    "de Odoo' en la pestaña Webhook."
+                ))
+            try:
+                rec._global_api().connect_instance(
+                    instance_id=rec.remote_id,
+                    webhook_url=rec.webhook_url,
+                    subscribe=["ALL"],
+                    immediate=True,
+                )
+            except EvolutionAPIError as exc:
+                rec.write({"last_error": str(exc)})
+                raise  # sin swallow: el usuario ve el error real de Evolution Go
+            rec.write({"last_error": False})
+            rec.message_post(body=_("Webhook registrado en Evolution Go: %s") % rec.webhook_url)
         return True
 
     def unlink(self):

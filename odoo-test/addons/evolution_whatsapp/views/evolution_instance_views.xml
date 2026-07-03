@@ -132,6 +132,11 @@
                                 <field name="evolution_webhook_base_url"/>
                                 <field name="evolution_default_country_code"/>
                             </group>
+                            <button name="action_register_webhook" type="object"
+                                    string="Registrar Webhook"
+                                    class="btn-primary"
+                                    invisible="state == 'draft'"
+                                    groups="evolution_whatsapp.group_evolution_manager"/>
                         </page>
                         <page string="Enviar prueba" invisible="state != 'connected'">
                             <group>
