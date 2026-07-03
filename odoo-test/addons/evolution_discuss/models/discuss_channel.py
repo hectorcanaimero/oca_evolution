@@ -43,14 +43,20 @@ class DiscussChannel(models.Model):
             })
 
         agents = self.env.ref("evolution_whatsapp.group_evolution_user").users
-        return self.create({
+        channel = self.create({
             "name": "WhatsApp: %s" % (push_name or phone_number),
             "channel_type": "channel",
-            "channel_partner_ids": [(6, 0, agents.mapped("partner_id").ids)],
             "evolution_instance_id": instance.id,
             "evolution_phone_number": phone_number,
             "evolution_partner_id": partner.id,
         })
+        # add_members() en vez de channel_partner_ids: [(6,0,ids)] en el create:
+        # ese command dispara un batching interno de discuss_channel_member que en
+        # esta versión de Odoo 18 corrompe el INSERT (partner_id termina como
+        # ARRAY[...] en vez de escalar) — confirmado en logs reales, no teórico.
+        if agents:
+            channel.add_members(agents.mapped("partner_id").ids, post_joined_message=False)
+        return channel
 
     def message_post(self, **kwargs):
         message = super().message_post(**kwargs)

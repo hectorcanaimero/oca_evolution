@@ -33,7 +33,10 @@
       "Bash(python3 -m json.tool)",
       "Bash(curl -s -X POST https://evogo.guria.lat/instance/connect -H 'Content-Type: application/json' -H 'apikey: ieZBwBqhXZ67x8knedkNygUoZ8ggcUJG' -H 'instanceId: dc977042-f951-478c-882e-49e2d541a896' -d '{\"webhookUrl\": \"https://42b3-200-150-68-28.ngrok-free.app/evolution/webhook/IBFzad92e3gg5O_QOxYyzPzvZNc4-IM-\", \"subscribe\": [\"ALL\"], \"immediate\": true}')",
       "Bash(python3 -m py_compile /Users/editor2/dev/evo_whatsapp/odoo-test/addons/evolution_whatsapp/models/evolution_api.py /Users/editor2/dev/evo_whatsapp/odoo-test/addons/evolution_whatsapp/models/evolution_instance.py /Users/editor2/dev/evo_whatsapp/odoo-test/addons/evolution_whatsapp/tests/test_evolution_webhook.py /Users/editor2/dev/evo_whatsapp/odoo-test/addons/evolution_whatsapp/tests/__init__.py)",
-      "Bash(python3 -c \"import xml.dom.minidom as m; m.parse\\('/Users/editor2/dev/evo_whatsapp/odoo-test/addons/evolution_whatsapp/views/evolution_instance_views.xml'\\); print\\('XML OK'\\)\")"
+      "Bash(python3 -c \"import xml.dom.minidom as m; m.parse\\('/Users/editor2/dev/evo_whatsapp/odoo-test/addons/evolution_whatsapp/views/evolution_instance_views.xml'\\); print\\('XML OK'\\)\")",
+      "Bash(git commit -q -m 'fix\\(webhook\\): registrar automáticamente contra Evolution Go + backfill de remote_id *)",
+      "Bash(python3 -c \"import json,sys; d=json.load\\(sys.stdin\\); print\\(repr\\(d['data'][0]['webhook']\\)\\)\")",
+      "Bash(python3 -m py_compile /Users/editor2/dev/evo_whatsapp/odoo-test/addons/evolution_discuss/models/discuss_channel.py)"
     ]
   }
 }
